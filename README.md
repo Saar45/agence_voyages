@@ -363,13 +363,6 @@ docker-compose down -v
 docker-compose up -d
 ```
 
-## Documentation
-
-- [DOCKER.md](DOCKER.md) - Guide complet Docker avec toutes les commandes
-- [DOCKER_COMMANDES.md](DOCKER_COMMANDES.md) - Aide-mémoire des commandes Docker
-- [QUICK_START.md](QUICK_START.md) - Guide de démarrage rapide
-- [CONFORMITE.md](CONFORMITE.md) - Vérification de conformité au cahier des charges
-- [EXEMPLES_TESTS.md](EXEMPLES_TESTS.md) - Exemples de tests avec cURL
 
 ## Besoin d'aide ?
 
@@ -391,8 +384,6 @@ ports:
 docker-compose down -v
 docker-compose up -d
 ```
-
-Voir [DOCKER.md](DOCKER.md) pour plus de solutions.
 
 ## Critères d'évaluation
 
@@ -406,14 +397,6 @@ Voir [DOCKER.md](DOCKER.md) pour plus de solutions.
 
 Projet réalisé par Mouhamed et Joel dans le cadre de l'apprentissage de Sequelize et de la modélisation de bases de données relationnelles.
 
-## Documentation
-
-- [DOCKER.md](DOCKER.md) - Guide complet Docker avec toutes les commandes
-- [DOCKER_COMMANDES.md](DOCKER_COMMANDES.md) - Aide-mémoire des commandes Docker
-- [QUICK_START.md](QUICK_START.md) - Guide de démarrage rapide
-- [CONFORMITE.md](CONFORMITE.md) - Vérification de conformité au cahier des charges
-- [EXEMPLES_TESTS.md](EXEMPLES_TESTS.md) - Exemples de tests avec cURL
-
 ## Besoin d'aide ?
 
 ### Problèmes courants
@@ -435,14 +418,8 @@ docker-compose down -v
 docker-compose up -d
 ```
 
-Voir [DOCKER.md](DOCKER.md) pour plus de solutions.
-
 ## Licence
 
 Ce projet est développé à des fins pédagogiques.
 
 ---
-
-**Bon voyage avec Sequelize et Docker !**
-
-> "Un bon voyageur n'a pas de plans fixes, et n'a pas l'intention d'arriver." - Lao Tseu
