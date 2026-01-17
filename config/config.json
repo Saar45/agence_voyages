@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "agence_user",
+    "password": "agence_password",
+    "database": "agence_voyages",
+    "host": "mariadb",
+    "dialect": "mariadb",
+    "dialectOptions": {
+      "timezone": "Europe/Paris"
+    }
+  },
+  "test": {
+    "username": "agence_user",
+    "password": "agence_password",
+    "database": "agence_voyages_test",
+    "host": "mariadb",
+    "dialect": "mariadb"
+  },
+  "production": {
+    "username": "agence_user",
+    "password": "agence_password",
+    "database": "agence_voyages_production",
+    "host": "mariadb",
+    "dialect": "mariadb"
+  }
+}

@@ -1,0 +1,725 @@
+{
+  "info": {
+    "name": "Agence Voyages API - Collection Complète",
+    "description": "Collection Postman complète pour tester l'API Voyages Horizon avec tous les cas de succès et d'erreur",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "Créer un client",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Marie\",\n  \"email\": \"marie.dupont@email.com\",\n  \"telephone\": \"+33612345678\",\n  \"dateNaissance\": \"1990-05-15\",\n  \"ville\": \"Paris\",\n  \"pays\": \"France\",\n  \"preferences\": {\n    \"typeVoyage\": [\"Culturel\", \"Gastronomique\"],\n    \"budget\": \"moyen\"\n  }\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "Créer un client - Email invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"prenom\": \"Erreur\",\n  \"email\": \"email-invalide\",\n  \"ville\": \"Paris\",\n  \"pays\": \"France\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "Créer un client - Email en double (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jean\",\n  \"email\": \"marie.dupont@email.com\",\n  \"ville\": \"Lyon\",\n  \"pays\": \"France\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "Créer un client - Champs manquants (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "Obtenir tous les clients",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "Obtenir un client par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/clients/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients", "1"]}
+          }
+        },
+        {
+          "name": "Obtenir un client - ID inexistant (ERREUR)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/clients/99999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients", "99999"]}
+          }
+        },
+        {
+          "name": "Mettre à jour un client",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telephone\": \"+33699999999\",\n  \"ville\": \"Bordeaux\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer un client",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/clients/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Destinations",
+      "item": [
+        {
+          "name": "Créer une destination",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Paris\",\n  \"pays\": \"France\",\n  \"continent\": \"Europe\",\n  \"description\": \"La ville lumière, capitale de la France\",\n  \"climat\": \"Tempéré\",\n  \"meilleurePeriode\": \"Avril à Octobre\",\n  \"langues\": \"Français\",\n  \"monnaie\": \"EUR\",\n  \"isActive\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/destinations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations"]}
+          }
+        },
+        {
+          "name": "Créer destination - Continent invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"pays\": \"Test\",\n  \"continent\": \"Atlantide\",\n  \"climat\": \"Tempéré\",\n  \"langues\": \"Test\",\n  \"monnaie\": \"TST\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/destinations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations"]}
+          }
+        },
+        {
+          "name": "Obtenir toutes les destinations",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/destinations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations"]}
+          }
+        },
+        {
+          "name": "Obtenir une destination par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/destinations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations", "1"]}
+          }
+        },
+        {
+          "name": "Obtenir destinations par continent",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/destinations/continent/Europe", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations", "continent", "Europe"]}
+          }
+        },
+        {
+          "name": "Obtenir voyages d'une destination",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/destinations/1/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations", "1", "voyages"]}
+          }
+        },
+        {
+          "name": "Mettre à jour une destination",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Description mise à jour\",\n  \"meilleurePeriode\": \"Toute l'année\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/destinations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer une destination",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/destinations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Voyages",
+      "item": [
+        {
+          "name": "Créer un voyage",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Découverte de Paris en 5 jours\",\n  \"description\": \"Visitez les monuments emblématiques de Paris\",\n  \"dateDepart\": \"2026-06-15T09:00:00\",\n  \"dateRetour\": \"2026-06-20T18:00:00\",\n  \"dureeJours\": 5,\n  \"prixBase\": 899.00,\n  \"placesDisponibles\": 20,\n  \"niveauDifficulte\": \"Facile\",\n  \"typeVoyage\": \"Culturel\",\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Créer voyage - Date retour avant départ (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Test Erreur\",\n  \"description\": \"Test\",\n  \"dateDepart\": \"2026-06-20\",\n  \"dateRetour\": \"2026-06-15\",\n  \"dureeJours\": 5,\n  \"prixBase\": 100,\n  \"placesDisponibles\": 10,\n  \"niveauDifficulte\": \"Facile\",\n  \"typeVoyage\": \"Culturel\",\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Créer voyage - Prix négatif (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Test Erreur\",\n  \"description\": \"Test\",\n  \"dateDepart\": \"2026-06-15\",\n  \"dateRetour\": \"2026-06-20\",\n  \"dureeJours\": 5,\n  \"prixBase\": -100,\n  \"placesDisponibles\": 10,\n  \"niveauDifficulte\": \"Facile\",\n  \"typeVoyage\": \"Culturel\",\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Créer voyage - Destination inexistante (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Test Erreur\",\n  \"description\": \"Test\",\n  \"dateDepart\": \"2026-06-15\",\n  \"dateRetour\": \"2026-06-20\",\n  \"dureeJours\": 5,\n  \"prixBase\": 100,\n  \"placesDisponibles\": 10,\n  \"niveauDifficulte\": \"Facile\",\n  \"typeVoyage\": \"Culturel\",\n  \"destinationId\": 99999\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Créer voyage - Type invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Test Erreur\",\n  \"description\": \"Test\",\n  \"dateDepart\": \"2026-06-15\",\n  \"dateRetour\": \"2026-06-20\",\n  \"dureeJours\": 5,\n  \"prixBase\": 100,\n  \"placesDisponibles\": 10,\n  \"niveauDifficulte\": \"Facile\",\n  \"typeVoyage\": \"TypeInvalide\",\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Obtenir tous les voyages",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "Obtenir un voyage par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/voyages/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1"]}
+          }
+        },
+        {
+          "name": "Obtenir les voyages à venir",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/voyages/prochains", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "prochains"]}
+          }
+        },
+        {
+          "name": "Mettre à jour un voyage",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prixBase\": 799.00,\n  \"placesDisponibles\": 25\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer un voyage",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/voyages/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1"]}
+          }
+        },
+        {
+          "name": "Réserver un voyage",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"nombrePersonnes\": 2\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1/reserver", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1", "reserver"]}
+          }
+        },
+        {
+          "name": "Réserver voyage - Client inexistant (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 99999,\n  \"nombrePersonnes\": 2\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1/reserver", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1", "reserver"]}
+          }
+        },
+        {
+          "name": "Réserver voyage - Nombre personnes invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"nombrePersonnes\": 0\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1/reserver", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1", "reserver"]}
+          }
+        },
+        {
+          "name": "Ajouter activité à un voyage",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activiteId\": 1,\n  \"jour\": 2,\n  \"ordre\": 1,\n  \"estInclus\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1", "activites"]}
+          }
+        },
+        {
+          "name": "Ajouter activité - Activité inexistante (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activiteId\": 99999,\n  \"jour\": 2,\n  \"ordre\": 1,\n  \"estInclus\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/1/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "1", "activites"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Réservations",
+      "item": [
+        {
+          "name": "Créer une réservation",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"voyageId\": 1,\n  \"nombrePersonnes\": 2\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/reservations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations"]}
+          }
+        },
+        {
+          "name": "Obtenir toutes les réservations",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/reservations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations"]}
+          }
+        },
+        {
+          "name": "Obtenir une réservation par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/reservations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "1"]}
+          }
+        },
+        {
+          "name": "Obtenir réservations d'un client",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/reservations/client/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "client", "1"]}
+          }
+        },
+        {
+          "name": "Obtenir réservations d'un voyage",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/reservations/voyage/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "voyage", "1"]}
+          }
+        },
+        {
+          "name": "Annuler une réservation",
+          "request": {
+            "method": "PUT",
+            "url": {"raw": "http://localhost:3000/api/reservations/1/annuler", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "1", "annuler"]}
+          }
+        },
+        {
+          "name": "Mettre à jour une réservation",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombrePersonnes\": 3,\n  \"statut\": \"Confirmée\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/reservations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer une réservation",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/reservations/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hébergements",
+      "item": [
+        {
+          "name": "Créer un hébergement",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Hôtel Le Marais\",\n  \"type\": \"Hôtel\",\n  \"categorie\": \"Confort\",\n  \"adresse\": \"15 Rue du Temple, 75004 Paris\",\n  \"nombreEtoiles\": 4,\n  \"equipements\": [\"WiFi\", \"Climatisation\", \"Restaurant\", \"Bar\", \"Parking\"],\n  \"prixNuit\": 150.00,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "Créer hébergement - Type invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"type\": \"TypeInvalide\",\n  \"categorie\": \"Confort\",\n  \"adresse\": \"Test\",\n  \"nombreEtoiles\": 4,\n  \"prixNuit\": 100,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "Créer hébergement - Étoiles invalides (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"type\": \"Hôtel\",\n  \"categorie\": \"Confort\",\n  \"adresse\": \"Test\",\n  \"nombreEtoiles\": 6,\n  \"prixNuit\": 100,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "Créer hébergement - Prix négatif (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"type\": \"Hôtel\",\n  \"categorie\": \"Confort\",\n  \"adresse\": \"Test\",\n  \"nombreEtoiles\": 4,\n  \"prixNuit\": -50,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "Obtenir tous les hébergements",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "Obtenir un hébergement par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/hebergements/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements", "1"]}
+          }
+        },
+        {
+          "name": "Mettre à jour un hébergement",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prixNuit\": 175.00,\n  \"equipements\": [\"WiFi\", \"Climatisation\", \"Restaurant\", \"Bar\", \"Parking\", \"Spa\"]\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer un hébergement",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/hebergements/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activités",
+      "item": [
+        {
+          "name": "Créer une activité",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Visite de la Tour Eiffel\",\n  \"description\": \"Montée au sommet de la Tour Eiffel avec guide\",\n  \"dureeHeures\": 2.5,\n  \"prix\": 25.00,\n  \"type\": \"Visite\",\n  \"niveauPhysique\": \"Modéré\",\n  \"ageMinimum\": 0,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Créer activité - Type invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"description\": \"Test\",\n  \"dureeHeures\": 2,\n  \"prix\": 20,\n  \"type\": \"TypeInvalide\",\n  \"niveauPhysique\": \"Modéré\",\n  \"ageMinimum\": 0,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Créer activité - Niveau physique invalide (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"description\": \"Test\",\n  \"dureeHeures\": 2,\n  \"prix\": 20,\n  \"type\": \"Sport\",\n  \"niveauPhysique\": \"Impossible\",\n  \"ageMinimum\": 0,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Créer activité - Durée négative (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"description\": \"Test\",\n  \"dureeHeures\": -2,\n  \"prix\": 20,\n  \"type\": \"Visite\",\n  \"niveauPhysique\": \"Faible\",\n  \"ageMinimum\": 0,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Créer activité - Age minimum négatif (ERREUR)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"description\": \"Test\",\n  \"dureeHeures\": 2,\n  \"prix\": 20,\n  \"type\": \"Visite\",\n  \"niveauPhysique\": \"Faible\",\n  \"ageMinimum\": -5,\n  \"destinationId\": 1\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Obtenir toutes les activités",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "Obtenir une activité par ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/activites/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites", "1"]}
+          }
+        },
+        {
+          "name": "Mettre à jour une activité",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prix\": 30.00,\n  \"dureeHeures\": 3\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites", "1"]}
+          }
+        },
+        {
+          "name": "Supprimer une activité",
+          "request": {
+            "method": "DELETE",
+            "url": {"raw": "http://localhost:3000/api/activites/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scénario Complet - Circuit Japon",
+      "item": [
+        {
+          "name": "1. Créer destination Tokyo",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Tokyo\",\n  \"pays\": \"Japon\",\n  \"continent\": \"Asie\",\n  \"description\": \"La fascinante capitale du Japon\",\n  \"climat\": \"Tempéré\",\n  \"meilleurePeriode\": \"Mars à Mai, Septembre à Novembre\",\n  \"langues\": \"Japonais\",\n  \"monnaie\": \"JPY\",\n  \"isActive\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/destinations", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "destinations"]}
+          }
+        },
+        {
+          "name": "2. Créer voyage Découverte du Japon",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Découverte du Japon\",\n  \"description\": \"Circuit complet à travers le Japon\",\n  \"dateDepart\": \"2026-05-01T09:00:00\",\n  \"dateRetour\": \"2026-05-16T18:00:00\",\n  \"dureeJours\": 15,\n  \"prixBase\": 2500.00,\n  \"placesDisponibles\": 20,\n  \"niveauDifficulte\": \"Modéré\",\n  \"typeVoyage\": \"Culturel\",\n  \"destinationId\": 11\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages"]}
+          }
+        },
+        {
+          "name": "3. Créer hébergement Hôtel Sakura",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Hôtel Sakura\",\n  \"type\": \"Hôtel\",\n  \"categorie\": \"Luxe\",\n  \"adresse\": \"1-1-1 Shibuya, Tokyo, Japon\",\n  \"nombreEtoiles\": 4,\n  \"equipements\": [\"WiFi\", \"Climatisation\", \"Restaurant\", \"Spa\", \"Salle de sport\"],\n  \"prixNuit\": 180.00,\n  \"destinationId\": 11\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/hebergements", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "hebergements"]}
+          }
+        },
+        {
+          "name": "4a. Créer activité Visite Tokyo",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Visite Tokyo\",\n  \"description\": \"Visite guidée des quartiers emblématiques\",\n  \"dureeHeures\": 8,\n  \"prix\": 120.00,\n  \"type\": \"Visite\",\n  \"niveauPhysique\": \"Modéré\",\n  \"ageMinimum\": 0,\n  \"destinationId\": 11\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "4b. Créer activité Mont Fuji",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Mont Fuji\",\n  \"description\": \"Excursion au Mont Fuji\",\n  \"dureeHeures\": 12,\n  \"prix\": 200.00,\n  \"type\": \"Sport\",\n  \"niveauPhysique\": \"Élevé\",\n  \"ageMinimum\": 12,\n  \"destinationId\": 11\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "activites"]}
+          }
+        },
+        {
+          "name": "5a. Associer Visite Tokyo au voyage",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activiteId\": 7,\n  \"jour\": 2,\n  \"ordre\": 1,\n  \"estInclus\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/5/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "5", "activites"]}
+          }
+        },
+        {
+          "name": "5b. Associer Mont Fuji au voyage",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activiteId\": 8,\n  \"jour\": 5,\n  \"ordre\": 1,\n  \"estInclus\": true\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/5/activites", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "5", "activites"]}
+          }
+        },
+        {
+          "name": "6. Créer client Dupont Jean",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Jean\",\n  \"email\": \"jean.dupont@email.com\",\n  \"telephone\": \"+33601020304\",\n  \"dateNaissance\": \"1985-03-15\",\n  \"ville\": \"Paris\",\n  \"pays\": \"France\"\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/clients", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "clients"]}
+          }
+        },
+        {
+          "name": "7. Réserver le voyage pour 2 personnes",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 7,\n  \"nombrePersonnes\": 2\n}"
+            },
+            "url": {"raw": "http://localhost:3000/api/voyages/5/reserver", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "5", "reserver"]}
+          }
+        },
+        {
+          "name": "8. Vérifier la réservation (5000€)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/reservations/3", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "reservations", "3"]}
+          }
+        },
+        {
+          "name": "9. Voir le voyage complet avec activités",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "http://localhost:3000/api/voyages/5", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "voyages", "5"]}
+          }
+        }
+      ]
+    }
+  ]
+}
