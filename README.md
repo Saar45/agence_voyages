@@ -421,5 +421,4 @@ docker-compose up -d
 ## Licence
 
 Ce projet est développé à des fins pédagogiques.
-
 ---
