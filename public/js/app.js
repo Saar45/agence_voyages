@@ -3,13 +3,16 @@
  * API interaction and UI management
  */
 
-const API_BASE_URL = '/api';
+(function() {
+  'use strict';
 
-// =============================================================================
-// API Service
-// =============================================================================
+  const API_BASE_URL = '/api';
 
-const api = {
+  // =============================================================================
+  // API Service
+  // =============================================================================
+
+  const api = {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
@@ -328,8 +331,9 @@ document.addEventListener('keydown', (e) => {
 // Export for use in page-specific scripts
 // =============================================================================
 
-window.VoyagesHorizon = {
-  api,
-  ui,
-  modal,
-};
+  window.VoyagesHorizon = {
+    api,
+    ui,
+    modal,
+  };
+})();
