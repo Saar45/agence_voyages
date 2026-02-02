@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voyages - Voyages Horizon</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <span>✈️</span>
+        Voyages Horizon
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/destinations.html">Destinations</a></li>
+        <li><a href="/voyages.html" class="active">Voyages</a></li>
+        <li><a href="/clients.html">Clients</a></li>
+        <li><a href="/reservations.html">Réservations</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Alert Container -->
+  <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 3000; width: 320px;"></div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1><span>✈️</span> Voyages</h1>
+      <button class="btn btn-primary" onclick="openAddModal()">
+        <span>➕</span> Nouveau voyage
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Type de voyage</label>
+        <select id="filter-type" onchange="loadVoyages()">
+          <option value="">Tous les types</option>
+          <option value="Culturel">Culturel</option>
+          <option value="Aventure">Aventure</option>
+          <option value="Détente">Détente</option>
+          <option value="Gastronomique">Gastronomique</option>
+          <option value="Sportif">Sportif</option>
+          <option value="Nature">Nature</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Niveau de difficulté</label>
+        <select id="filter-difficulte" onchange="loadVoyages()">
+          <option value="">Tous les niveaux</option>
+          <option value="Facile">Facile</option>
+          <option value="Modéré">Modéré</option>
+          <option value="Difficile">Difficile</option>
+          <option value="Extrême">Extrême</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Voyages Grid -->
+    <div id="voyages-container" class="card-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="voyage-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>✈️</span> <span id="modal-title">Nouveau voyage</span></h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('voyage-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="voyage-form">
+          <input type="hidden" id="voyage-id">
+          
+          <div class="form-group">
+            <label class="form-label">Titre *</label>
+            <input type="text" id="voyage-titre" class="form-control" required placeholder="Ex: Découverte de Paris">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Destination *</label>
+            <select id="voyage-destinationId" class="form-control" required>
+              <option value="">Sélectionner une destination...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="voyage-description" class="form-control" rows="3" placeholder="Description du voyage..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date de départ *</label>
+              <input type="date" id="voyage-dateDepart" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date de retour *</label>
+              <input type="date" id="voyage-dateRetour" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Durée (jours) *</label>
+              <input type="number" id="voyage-dureeJours" class="form-control" required min="1" placeholder="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prix de base (€) *</label>
+              <input type="number" id="voyage-prixBase" class="form-control" required min="0" step="0.01" placeholder="899.00">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Places disponibles *</label>
+              <input type="number" id="voyage-placesDisponibles" class="form-control" required min="0" placeholder="20">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type de voyage *</label>
+              <select id="voyage-typeVoyage" class="form-control" required>
+                <option value="">Sélectionner...</option>
+                <option value="Culturel">Culturel</option>
+                <option value="Aventure">Aventure</option>
+                <option value="Détente">Détente</option>
+                <option value="Gastronomique">Gastronomique</option>
+                <option value="Sportif">Sportif</option>
+                <option value="Nature">Nature</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Niveau de difficulté *</label>
+            <select id="voyage-niveauDifficulte" class="form-control" required>
+              <option value="">Sélectionner...</option>
+              <option value="Facile">Facile</option>
+              <option value="Modéré">Modéré</option>
+              <option value="Difficile">Difficile</option>
+              <option value="Extrême">Extrême</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('voyage-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveVoyage()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2><span>📋</span> Réserver ce voyage</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('booking-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="booking-voyage-info" class="mb-2"></div>
+        <form id="booking-form">
+          <input type="hidden" id="booking-voyageId">
+          
+          <div class="form-group">
+            <label class="form-label">Client *</label>
+            <select id="booking-clientId" class="form-control" required>
+              <option value="">Sélectionner un client...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nombre de personnes *</label>
+            <input type="number" id="booking-nombrePersonnes" class="form-control" required min="1" value="1">
+          </div>
+
+          <div id="booking-total" class="alert alert-info"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('booking-modal')">Annuler</button>
+        <button class="btn btn-success" onclick="confirmBooking()">Confirmer la réservation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2><span>⚠️</span> Confirmation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('delete-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer ce voyage ?</p>
+        <p class="text-secondary">Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('delete-modal')">Annuler</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const { api, ui, modal } = window.VoyagesHorizon;
+    let voyageToDelete = null;
+    let currentVoyagePrice = 0;
+    let destinations = [];
+    let clients = [];
+
+    // Load destinations for select
+    async function loadDestinationsSelect() {
+      try {
+        const response = await api.getDestinations({ limit: 100 });
+        destinations = response.data || [];
+        const select = document.getElementById('voyage-destinationId');
+        select.innerHTML = '<option value="">Sélectionner une destination...</option>' +
+          destinations.map(d => `<option value="${d.id}">${d.nom}, ${d.pays}</option>`).join('');
+      } catch (error) {
+        console.error('Error loading destinations:', error);
+      }
+    }
+
+    // Load clients for booking
+    async function loadClientsSelect() {
+      try {
+        const response = await api.getClients({ limit: 100 });
+        clients = response.data || [];
+        const select = document.getElementById('booking-clientId');
+        select.innerHTML = '<option value="">Sélectionner un client...</option>' +
+          clients.map(c => `<option value="${c.id}">${c.prenom} ${c.nom} (${c.email})</option>`).join('');
+      } catch (error) {
+        console.error('Error loading clients:', error);
+      }
+    }
+
+    // Load voyages
+    async function loadVoyages() {
+      const container = document.getElementById('voyages-container');
+      ui.showLoading(container);
+
+      const typeVoyage = document.getElementById('filter-type').value;
+      const niveauDifficulte = document.getElementById('filter-difficulte').value;
+
+      try {
+        const params = { limit: 50 };
+        if (typeVoyage) params.typeVoyage = typeVoyage;
+        if (niveauDifficulte) params.niveauDifficulte = niveauDifficulte;
+
+        const response = await api.getVoyages(params);
+        const voyages = response.data || [];
+
+        if (voyages.length === 0) {
+          ui.showEmpty(container, 'Aucun voyage trouvé', '✈️');
+          return;
+        }
+
+        container.innerHTML = voyages.map(voyage => {
+          const isPast = new Date(voyage.dateDepart) < new Date();
+          const noPlaces = voyage.placesDisponibles <= 0;
+          
+          return `
+            <div class="card">
+              <div class="card-header">
+                <h3>${voyage.titre}</h3>
+                <p>${voyage.destination?.nom || 'Destination'}, ${voyage.destination?.pays || ''}</p>
+              </div>
+              <div class="card-body">
+                <div class="card-info">
+                  <div class="card-info-item">
+                    <span>📅</span>
+                    <span>${ui.formatDate(voyage.dateDepart)} - ${ui.formatDate(voyage.dateRetour)}</span>
+                  </div>
+                  <div class="card-info-item">
+                    <span>⏱️</span>
+                    <span>${voyage.dureeJours} jours</span>
+                  </div>
+                  <div class="card-info-item">
+                    <span>👥</span>
+                    <span>${voyage.placesDisponibles} places</span>
+                  </div>
+                </div>
+                <p class="card-description">${voyage.description || 'Découvrez cette destination exceptionnelle.'}</p>
+                <span class="badge ${ui.getBadgeClass(voyage.niveauDifficulte)}">${voyage.niveauDifficulte}</span>
+                <span class="badge badge-info">${voyage.typeVoyage}</span>
+                ${isPast ? '<span class="badge badge-danger">Passé</span>' : ''}
+                ${noPlaces ? '<span class="badge badge-warning">Complet</span>' : ''}
+              </div>
+              <div class="card-footer">
+                <div class="card-price">
+                  ${ui.formatPrice(voyage.prixBase)}
+                  <small>/pers.</small>
+                </div>
+                <div class="table-actions">
+                  ${!isPast && !noPlaces ? `<button class="btn btn-sm btn-success" onclick="openBookingModal(${voyage.id})">📋 Réserver</button>` : ''}
+                  <button class="btn btn-sm btn-outline" onclick="editVoyage(${voyage.id})">✏️</button>
+                  <button class="btn btn-sm btn-danger" onclick="confirmDelete(${voyage.id})">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (error) {
+        ui.showError(container, 'Impossible de charger les voyages');
+      }
+    }
+
+    // Open add modal
+    async function openAddModal() {
+      await loadDestinationsSelect();
+      document.getElementById('modal-title').textContent = 'Nouveau voyage';
+      document.getElementById('voyage-form').reset();
+      document.getElementById('voyage-id').value = '';
+      modal.open('voyage-modal');
+    }
+
+    // Edit voyage
+    async function editVoyage(id) {
+      await loadDestinationsSelect();
+      
+      try {
+        const response = await api.getVoyage(id);
+        const voyage = response.data;
+
+        document.getElementById('modal-title').textContent = 'Modifier le voyage';
+        document.getElementById('voyage-id').value = voyage.id;
+        document.getElementById('voyage-titre').value = voyage.titre || '';
+        document.getElementById('voyage-destinationId').value = voyage.destinationId || '';
+        document.getElementById('voyage-description').value = voyage.description || '';
+        document.getElementById('voyage-dateDepart').value = voyage.dateDepart ? voyage.dateDepart.split('T')[0] : '';
+        document.getElementById('voyage-dateRetour').value = voyage.dateRetour ? voyage.dateRetour.split('T')[0] : '';
+        document.getElementById('voyage-dureeJours').value = voyage.dureeJours || '';
+        document.getElementById('voyage-prixBase').value = voyage.prixBase || '';
+        document.getElementById('voyage-placesDisponibles').value = voyage.placesDisponibles || '';
+        document.getElementById('voyage-typeVoyage').value = voyage.typeVoyage || '';
+        document.getElementById('voyage-niveauDifficulte').value = voyage.niveauDifficulte || '';
+
+        modal.open('voyage-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger le voyage', 'danger');
+      }
+    }
+
+    // Save voyage
+    async function saveVoyage() {
+      const id = document.getElementById('voyage-id').value;
+      const data = {
+        titre: document.getElementById('voyage-titre').value,
+        destinationId: parseInt(document.getElementById('voyage-destinationId').value),
+        description: document.getElementById('voyage-description').value,
+        dateDepart: document.getElementById('voyage-dateDepart').value,
+        dateRetour: document.getElementById('voyage-dateRetour').value,
+        dureeJours: parseInt(document.getElementById('voyage-dureeJours').value),
+        prixBase: parseFloat(document.getElementById('voyage-prixBase').value),
+        placesDisponibles: parseInt(document.getElementById('voyage-placesDisponibles').value),
+        typeVoyage: document.getElementById('voyage-typeVoyage').value,
+        niveauDifficulte: document.getElementById('voyage-niveauDifficulte').value,
+      };
+
+      try {
+        if (id) {
+          await api.updateVoyage(id, data);
+          ui.showAlert('Voyage mis à jour avec succès', 'success');
+        } else {
+          await api.createVoyage(data);
+          ui.showAlert('Voyage créé avec succès', 'success');
+        }
+        modal.close('voyage-modal');
+        loadVoyages();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de l\'enregistrement', 'danger');
+      }
+    }
+
+    // Open booking modal
+    async function openBookingModal(voyageId) {
+      await loadClientsSelect();
+      
+      try {
+        const response = await api.getVoyage(voyageId);
+        const voyage = response.data;
+
+        currentVoyagePrice = parseFloat(voyage.prixBase);
+        document.getElementById('booking-voyageId').value = voyage.id;
+        document.getElementById('booking-voyage-info').innerHTML = `
+          <strong>${voyage.titre}</strong><br>
+          <small>${voyage.destination?.nom || ''}, ${voyage.destination?.pays || ''}</small><br>
+          <small>Du ${ui.formatDate(voyage.dateDepart)} au ${ui.formatDate(voyage.dateRetour)}</small><br>
+          <small>Places disponibles: ${voyage.placesDisponibles}</small>
+        `;
+        document.getElementById('booking-nombrePersonnes').value = 1;
+        document.getElementById('booking-nombrePersonnes').max = voyage.placesDisponibles;
+        updateBookingTotal();
+        
+        modal.open('booking-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger le voyage', 'danger');
+      }
+    }
+
+    // Update booking total
+    function updateBookingTotal() {
+      const nombrePersonnes = parseInt(document.getElementById('booking-nombrePersonnes').value) || 1;
+      const total = currentVoyagePrice * nombrePersonnes;
+      document.getElementById('booking-total').innerHTML = `
+        <strong>Total: ${ui.formatPrice(total)}</strong> (${nombrePersonnes} x ${ui.formatPrice(currentVoyagePrice)})
+      `;
+    }
+
+    document.getElementById('booking-nombrePersonnes').addEventListener('input', updateBookingTotal);
+
+    // Confirm booking
+    async function confirmBooking() {
+      const voyageId = document.getElementById('booking-voyageId').value;
+      const clientId = document.getElementById('booking-clientId').value;
+      const nombrePersonnes = parseInt(document.getElementById('booking-nombrePersonnes').value);
+
+      if (!clientId) {
+        ui.showAlert('Veuillez sélectionner un client', 'warning');
+        return;
+      }
+
+      try {
+        await api.bookVoyage(voyageId, clientId, nombrePersonnes);
+        ui.showAlert('Réservation effectuée avec succès !', 'success');
+        modal.close('booking-modal');
+        loadVoyages();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la réservation', 'danger');
+      }
+    }
+
+    // Confirm delete
+    function confirmDelete(id) {
+      voyageToDelete = id;
+      modal.open('delete-modal');
+    }
+
+    // Delete voyage
+    document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+      if (!voyageToDelete) return;
+
+      try {
+        await api.deleteVoyage(voyageToDelete);
+        ui.showAlert('Voyage supprimé avec succès', 'success');
+        modal.close('delete-modal');
+        loadVoyages();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la suppression', 'danger');
+      }
+      voyageToDelete = null;
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadVoyages);
+  </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destinations - Voyages Horizon</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <span>✈️</span>
+        Voyages Horizon
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/destinations.html" class="active">Destinations</a></li>
+        <li><a href="/voyages.html">Voyages</a></li>
+        <li><a href="/clients.html">Clients</a></li>
+        <li><a href="/reservations.html">Réservations</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Alert Container -->
+  <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 3000; width: 320px;"></div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1><span>🌍</span> Destinations</h1>
+      <button class="btn btn-primary" onclick="openAddModal()">
+        <span>➕</span> Nouvelle destination
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Continent</label>
+        <select id="filter-continent" onchange="loadDestinations()">
+          <option value="">Tous les continents</option>
+          <option value="Europe">Europe</option>
+          <option value="Asie">Asie</option>
+          <option value="Amérique">Amérique</option>
+          <option value="Afrique">Afrique</option>
+          <option value="Océanie">Océanie</option>
+          <option value="Antarctique">Antarctique</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Statut</label>
+        <select id="filter-active" onchange="loadDestinations()">
+          <option value="">Toutes</option>
+          <option value="true">Actives</option>
+          <option value="false">Inactives</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Destinations Grid -->
+    <div id="destinations-container" class="card-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="destination-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>🌍</span> <span id="modal-title">Nouvelle destination</span></h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('destination-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="destination-form">
+          <input type="hidden" id="destination-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom *</label>
+              <input type="text" id="destination-nom" class="form-control" required placeholder="Ex: Paris">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pays *</label>
+              <input type="text" id="destination-pays" class="form-control" required placeholder="Ex: France">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Continent *</label>
+              <select id="destination-continent" class="form-control" required>
+                <option value="">Sélectionner...</option>
+                <option value="Europe">Europe</option>
+                <option value="Asie">Asie</option>
+                <option value="Amérique">Amérique</option>
+                <option value="Afrique">Afrique</option>
+                <option value="Océanie">Océanie</option>
+                <option value="Antarctique">Antarctique</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Climat</label>
+              <select id="destination-climat" class="form-control">
+                <option value="">Sélectionner...</option>
+                <option value="Tropical">Tropical</option>
+                <option value="Tempéré">Tempéré</option>
+                <option value="Méditerranéen">Méditerranéen</option>
+                <option value="Aride">Aride</option>
+                <option value="Polaire">Polaire</option>
+                <option value="Continental">Continental</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="destination-description" class="form-control" rows="3" placeholder="Description de la destination..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Meilleure période</label>
+              <input type="text" id="destination-meilleurePeriode" class="form-control" placeholder="Ex: Avril à Octobre">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Langues</label>
+              <input type="text" id="destination-langues" class="form-control" placeholder="Ex: Français, Anglais">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Monnaie</label>
+              <input type="text" id="destination-monnaie" class="form-control" placeholder="Ex: EUR">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Statut</label>
+              <select id="destination-isActive" class="form-control">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('destination-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveDestination()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2><span>⚠️</span> Confirmation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('delete-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette destination ?</p>
+        <p class="text-secondary">Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('delete-modal')">Annuler</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const { api, ui, modal } = window.VoyagesHorizon;
+    let destinationToDelete = null;
+
+    // Load destinations
+    async function loadDestinations() {
+      const container = document.getElementById('destinations-container');
+      ui.showLoading(container);
+
+      const continent = document.getElementById('filter-continent').value;
+      const isActive = document.getElementById('filter-active').value;
+
+      try {
+        const params = { limit: 50 };
+        if (continent) params.continent = continent;
+        if (isActive) params.isActive = isActive;
+
+        const response = await api.getDestinations(params);
+        const destinations = response.data || [];
+
+        if (destinations.length === 0) {
+          ui.showEmpty(container, 'Aucune destination trouvée', '🌍');
+          return;
+        }
+
+        container.innerHTML = destinations.map(dest => `
+          <div class="card">
+            <div class="card-header">
+              <h3>${ui.getContinentIcon(dest.continent)} ${dest.nom}</h3>
+              <p>${dest.pays}</p>
+            </div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-info-item">
+                  <span>🌡️</span>
+                  <span>${dest.climat || 'Non spécifié'}</span>
+                </div>
+                <div class="card-info-item">
+                  <span>🗓️</span>
+                  <span>${dest.meilleurePeriode || 'Toute l\'année'}</span>
+                </div>
+                <div class="card-info-item">
+                  <span>💬</span>
+                  <span>${dest.langues || 'Non spécifié'}</span>
+                </div>
+              </div>
+              <p class="card-description">${dest.description || 'Aucune description disponible.'}</p>
+              <span class="badge badge-primary">${dest.continent}</span>
+              <span class="badge ${dest.isActive ? 'badge-success' : 'badge-danger'}">${dest.isActive ? 'Active' : 'Inactive'}</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-info-item">
+                <span>💱</span>
+                <span>${dest.monnaie || '-'}</span>
+              </span>
+              <div class="table-actions">
+                <button class="btn btn-sm btn-outline" onclick="editDestination(${dest.id})">✏️ Modifier</button>
+                <button class="btn btn-sm btn-danger" onclick="confirmDelete(${dest.id})">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        ui.showError(container, 'Impossible de charger les destinations');
+      }
+    }
+
+    // Open add modal
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Nouvelle destination';
+      document.getElementById('destination-form').reset();
+      document.getElementById('destination-id').value = '';
+      document.getElementById('destination-isActive').value = 'true';
+      modal.open('destination-modal');
+    }
+
+    // Edit destination
+    async function editDestination(id) {
+      try {
+        const response = await api.getDestination(id);
+        const dest = response.data;
+
+        document.getElementById('modal-title').textContent = 'Modifier la destination';
+        document.getElementById('destination-id').value = dest.id;
+        document.getElementById('destination-nom').value = dest.nom || '';
+        document.getElementById('destination-pays').value = dest.pays || '';
+        document.getElementById('destination-continent').value = dest.continent || '';
+        document.getElementById('destination-description').value = dest.description || '';
+        document.getElementById('destination-climat').value = dest.climat || '';
+        document.getElementById('destination-meilleurePeriode').value = dest.meilleurePeriode || '';
+        document.getElementById('destination-langues').value = dest.langues || '';
+        document.getElementById('destination-monnaie').value = dest.monnaie || '';
+        document.getElementById('destination-isActive').value = dest.isActive ? 'true' : 'false';
+
+        modal.open('destination-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger la destination', 'danger');
+      }
+    }
+
+    // Save destination
+    async function saveDestination() {
+      const id = document.getElementById('destination-id').value;
+      const data = {
+        nom: document.getElementById('destination-nom').value,
+        pays: document.getElementById('destination-pays').value,
+        continent: document.getElementById('destination-continent').value,
+        description: document.getElementById('destination-description').value,
+        climat: document.getElementById('destination-climat').value,
+        meilleurePeriode: document.getElementById('destination-meilleurePeriode').value,
+        langues: document.getElementById('destination-langues').value,
+        monnaie: document.getElementById('destination-monnaie').value,
+        isActive: document.getElementById('destination-isActive').value === 'true',
+      };
+
+      try {
+        if (id) {
+          await api.updateDestination(id, data);
+          ui.showAlert('Destination mise à jour avec succès', 'success');
+        } else {
+          await api.createDestination(data);
+          ui.showAlert('Destination créée avec succès', 'success');
+        }
+        modal.close('destination-modal');
+        loadDestinations();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de l\'enregistrement', 'danger');
+      }
+    }
+
+    // Confirm delete
+    function confirmDelete(id) {
+      destinationToDelete = id;
+      modal.open('delete-modal');
+    }
+
+    // Delete destination
+    document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+      if (!destinationToDelete) return;
+
+      try {
+        await api.deleteDestination(destinationToDelete);
+        ui.showAlert('Destination supprimée avec succès', 'success');
+        modal.close('delete-modal');
+        loadDestinations();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la suppression', 'danger');
+      }
+      destinationToDelete = null;
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadDestinations);
+  </script>
+</body>
+</html>

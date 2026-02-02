@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voyages Horizon - Agence de Voyages</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <span>✈️</span>
+        Voyages Horizon
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="/" class="active">Accueil</a></li>
+        <li><a href="/destinations.html">Destinations</a></li>
+        <li><a href="/voyages.html">Voyages</a></li>
+        <li><a href="/clients.html">Clients</a></li>
+        <li><a href="/reservations.html">Réservations</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Alert Container -->
+  <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 3000; width: 320px;"></div>
+
+  <!-- Hero Section -->
+  <div class="container">
+    <div class="hero">
+      <h1>🌍 Bienvenue chez Voyages Horizon</h1>
+      <p>Découvrez le monde avec nous ! Des destinations exceptionnelles, des voyages inoubliables et un service personnalisé pour vivre vos rêves d'évasion.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon primary">🌍</div>
+        <div class="stat-content">
+          <h3 id="stat-destinations">-</h3>
+          <p>Destinations</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon success">✈️</div>
+        <div class="stat-content">
+          <h3 id="stat-voyages">-</h3>
+          <p>Voyages disponibles</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon warning">👥</div>
+        <div class="stat-content">
+          <h3 id="stat-clients">-</h3>
+          <p>Clients</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon info">📋</div>
+        <div class="stat-content">
+          <h3 id="stat-reservations">-</h3>
+          <p>Réservations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Voyages -->
+    <div class="page-header">
+      <h1><span>🚀</span> Prochains Voyages</h1>
+      <a href="/voyages.html" class="btn btn-outline">Voir tous les voyages</a>
+    </div>
+
+    <div id="upcoming-voyages" class="card-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    </div>
+
+    <!-- Popular Destinations -->
+    <div class="page-header mt-3">
+      <h1><span>🌟</span> Destinations Populaires</h1>
+      <a href="/destinations.html" class="btn btn-outline">Voir toutes les destinations</a>
+    </div>
+
+    <div id="popular-destinations" class="card-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const { api, ui } = window.VoyagesHorizon;
+
+    // Load statistics
+    async function loadStats() {
+      try {
+        const [destinations, voyages, clients, reservations] = await Promise.all([
+          api.getDestinations({ limit: 1 }),
+          api.getVoyages({ limit: 1 }),
+          api.getClients({ limit: 1 }),
+          api.getReservations(),
+        ]);
+
+        document.getElementById('stat-destinations').textContent = destinations.pagination?.total || 0;
+        document.getElementById('stat-voyages').textContent = voyages.pagination?.total || 0;
+        document.getElementById('stat-clients').textContent = clients.pagination?.total || 0;
+        document.getElementById('stat-reservations').textContent = reservations.data?.length || 0;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    // Load upcoming voyages
+    async function loadUpcomingVoyages() {
+      const container = document.getElementById('upcoming-voyages');
+      
+      try {
+        const response = await api.getUpcomingVoyages();
+        const voyages = response.data || [];
+
+        if (voyages.length === 0) {
+          ui.showEmpty(container, 'Aucun voyage à venir', '✈️');
+          return;
+        }
+
+        container.innerHTML = voyages.slice(0, 3).map(voyage => `
+          <div class="card">
+            <div class="card-header">
+              <h3>${voyage.titre}</h3>
+              <p>${voyage.destination?.nom || 'Destination'}, ${voyage.destination?.pays || ''}</p>
+            </div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-info-item">
+                  <span>📅</span>
+                  <span>${ui.formatDate(voyage.dateDepart)}</span>
+                </div>
+                <div class="card-info-item">
+                  <span>⏱️</span>
+                  <span>${voyage.dureeJours} jours</span>
+                </div>
+                <div class="card-info-item">
+                  <span>👥</span>
+                  <span>${voyage.placesDisponibles} places</span>
+                </div>
+              </div>
+              <p class="card-description">${voyage.description || 'Découvrez cette destination exceptionnelle.'}</p>
+              <span class="badge ${ui.getBadgeClass(voyage.niveauDifficulte)}">${voyage.niveauDifficulte}</span>
+              <span class="badge badge-info">${voyage.typeVoyage}</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price">
+                ${ui.formatPrice(voyage.prixBase)}
+                <small>/pers.</small>
+              </div>
+              <a href="/voyages.html?id=${voyage.id}" class="btn btn-primary">Réserver</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        ui.showError(container, 'Impossible de charger les voyages');
+      }
+    }
+
+    // Load popular destinations
+    async function loadPopularDestinations() {
+      const container = document.getElementById('popular-destinations');
+      
+      try {
+        const response = await api.getDestinations({ limit: 3, isActive: true });
+        const destinations = response.data || [];
+
+        if (destinations.length === 0) {
+          ui.showEmpty(container, 'Aucune destination disponible', '🌍');
+          return;
+        }
+
+        container.innerHTML = destinations.map(dest => `
+          <div class="card">
+            <div class="card-header">
+              <h3>${ui.getContinentIcon(dest.continent)} ${dest.nom}</h3>
+              <p>${dest.pays}</p>
+            </div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-info-item">
+                  <span>🌡️</span>
+                  <span>${dest.climat || 'Climat variable'}</span>
+                </div>
+                <div class="card-info-item">
+                  <span>🗓️</span>
+                  <span>${dest.meilleurePeriode || 'Toute l\'année'}</span>
+                </div>
+              </div>
+              <p class="card-description">${dest.description || 'Une destination à découvrir.'}</p>
+              <span class="badge badge-primary">${dest.continent}</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-info-item">
+                <span>💱</span>
+                <span>${dest.monnaie || '-'}</span>
+              </span>
+              <a href="/destinations.html?id=${dest.id}" class="btn btn-outline">Explorer</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        ui.showError(container, 'Impossible de charger les destinations');
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStats();
+      loadUpcomingVoyages();
+      loadPopularDestinations();
+    });
+  </script>
+</body>
+</html>
