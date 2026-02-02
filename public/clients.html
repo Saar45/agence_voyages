@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients - Voyages Horizon</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <span>✈️</span>
+        Voyages Horizon
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/destinations.html">Destinations</a></li>
+        <li><a href="/voyages.html">Voyages</a></li>
+        <li><a href="/clients.html" class="active">Clients</a></li>
+        <li><a href="/reservations.html">Réservations</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Alert Container -->
+  <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 3000; width: 320px;"></div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1><span>👥</span> Clients</h1>
+      <button class="btn btn-primary" onclick="openAddModal()">
+        <span>➕</span> Nouveau client
+      </button>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="table-container">
+      <table class="table" id="clients-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Contact</th>
+            <th>Localisation</th>
+            <th>Date de naissance</th>
+            <th>Inscrit le</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clients-body">
+          <tr>
+            <td colspan="6">
+              <div class="loading">
+                <div class="spinner"></div>
+                <p>Chargement...</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="client-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>👤</span> <span id="modal-title">Nouveau client</span></h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('client-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="client-form">
+          <input type="hidden" id="client-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom *</label>
+              <input type="text" id="client-nom" class="form-control" required placeholder="Ex: Dupont">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prénom *</label>
+              <input type="text" id="client-prenom" class="form-control" required placeholder="Ex: Marie">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" id="client-email" class="form-control" required placeholder="Ex: marie.dupont@email.com">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Téléphone</label>
+              <input type="tel" id="client-telephone" class="form-control" placeholder="Ex: +33612345678">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date de naissance</label>
+              <input type="date" id="client-dateNaissance" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ville</label>
+              <input type="text" id="client-ville" class="form-control" placeholder="Ex: Paris">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pays</label>
+              <input type="text" id="client-pays" class="form-control" placeholder="Ex: France">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('client-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveClient()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Client Modal -->
+  <div id="view-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>👤</span> Détails du client</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('view-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="view-content">
+        <!-- Content loaded dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('view-modal')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2><span>⚠️</span> Confirmation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('delete-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer ce client ?</p>
+        <p class="text-secondary">Cette action est irréversible et supprimera également ses réservations.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('delete-modal')">Annuler</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const { api, ui, modal } = window.VoyagesHorizon;
+    let clientToDelete = null;
+
+    // Load clients
+    async function loadClients() {
+      const tbody = document.getElementById('clients-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement...</p>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const response = await api.getClients({ limit: 100 });
+        const clients = response.data || [];
+
+        if (clients.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <span>👥</span>
+                  <h3>Aucun client trouvé</h3>
+                  <p>Commencez par ajouter un nouveau client.</p>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = clients.map(client => `
+          <tr>
+            <td>
+              <strong>${client.prenom} ${client.nom}</strong>
+            </td>
+            <td>
+              <div class="card-info-item">
+                <span>📧</span>
+                <span>${client.email}</span>
+              </div>
+              ${client.telephone ? `
+                <div class="card-info-item">
+                  <span>📞</span>
+                  <span>${client.telephone}</span>
+                </div>
+              ` : ''}
+            </td>
+            <td>
+              ${client.ville || client.pays ? `
+                <div class="card-info-item">
+                  <span>📍</span>
+                  <span>${[client.ville, client.pays].filter(Boolean).join(', ')}</span>
+                </div>
+              ` : '-'}
+            </td>
+            <td>${client.dateNaissance ? ui.formatDate(client.dateNaissance) : '-'}</td>
+            <td>${ui.formatDate(client.createdAt)}</td>
+            <td>
+              <div class="table-actions">
+                <button class="btn btn-sm btn-outline" onclick="viewClient(${client.id})">👁️</button>
+                <button class="btn btn-sm btn-outline" onclick="editClient(${client.id})">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="confirmDelete(${client.id})">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div class="alert alert-danger">
+                <span>⚠️</span>
+                <span>Impossible de charger les clients</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Open add modal
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Nouveau client';
+      document.getElementById('client-form').reset();
+      document.getElementById('client-id').value = '';
+      modal.open('client-modal');
+    }
+
+    // View client
+    async function viewClient(id) {
+      try {
+        const response = await api.getClient(id);
+        const client = response.data;
+
+        const reservations = client.reservations || [];
+        
+        document.getElementById('view-content').innerHTML = `
+          <div class="mb-2">
+            <h3>👤 ${client.prenom} ${client.nom}</h3>
+          </div>
+          
+          <div class="card-info mb-2">
+            <div class="card-info-item">
+              <span>📧</span>
+              <span>${client.email}</span>
+            </div>
+            ${client.telephone ? `
+              <div class="card-info-item">
+                <span>📞</span>
+                <span>${client.telephone}</span>
+              </div>
+            ` : ''}
+            ${client.ville || client.pays ? `
+              <div class="card-info-item">
+                <span>📍</span>
+                <span>${[client.ville, client.pays].filter(Boolean).join(', ')}</span>
+              </div>
+            ` : ''}
+            ${client.dateNaissance ? `
+              <div class="card-info-item">
+                <span>🎂</span>
+                <span>${ui.formatDate(client.dateNaissance)}</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <h4 class="mb-1">📋 Réservations (${reservations.length})</h4>
+          ${reservations.length > 0 ? `
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Voyage</th>
+                    <th>Personnes</th>
+                    <th>Prix</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${reservations.map(r => `
+                    <tr>
+                      <td>${r.voyage?.titre || 'Voyage #' + r.voyageId}</td>
+                      <td>${r.nombrePersonnes}</td>
+                      <td>${ui.formatPrice(r.prixTotal)}</td>
+                      <td><span class="badge ${ui.getBadgeClass(r.statut)}">${r.statut}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : '<p class="text-secondary">Aucune réservation pour ce client.</p>'}
+        `;
+
+        modal.open('view-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger les détails du client', 'danger');
+      }
+    }
+
+    // Edit client
+    async function editClient(id) {
+      try {
+        const response = await api.getClient(id);
+        const client = response.data;
+
+        document.getElementById('modal-title').textContent = 'Modifier le client';
+        document.getElementById('client-id').value = client.id;
+        document.getElementById('client-nom').value = client.nom || '';
+        document.getElementById('client-prenom').value = client.prenom || '';
+        document.getElementById('client-email').value = client.email || '';
+        document.getElementById('client-telephone').value = client.telephone || '';
+        document.getElementById('client-dateNaissance').value = client.dateNaissance ? client.dateNaissance.split('T')[0] : '';
+        document.getElementById('client-ville').value = client.ville || '';
+        document.getElementById('client-pays').value = client.pays || '';
+
+        modal.open('client-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger le client', 'danger');
+      }
+    }
+
+    // Save client
+    async function saveClient() {
+      const id = document.getElementById('client-id').value;
+      const data = {
+        nom: document.getElementById('client-nom').value,
+        prenom: document.getElementById('client-prenom').value,
+        email: document.getElementById('client-email').value,
+        telephone: document.getElementById('client-telephone').value || null,
+        dateNaissance: document.getElementById('client-dateNaissance').value || null,
+        ville: document.getElementById('client-ville').value || null,
+        pays: document.getElementById('client-pays').value || null,
+      };
+
+      try {
+        if (id) {
+          await api.updateClient(id, data);
+          ui.showAlert('Client mis à jour avec succès', 'success');
+        } else {
+          await api.createClient(data);
+          ui.showAlert('Client créé avec succès', 'success');
+        }
+        modal.close('client-modal');
+        loadClients();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de l\'enregistrement', 'danger');
+      }
+    }
+
+    // Confirm delete
+    function confirmDelete(id) {
+      clientToDelete = id;
+      modal.open('delete-modal');
+    }
+
+    // Delete client
+    document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+      if (!clientToDelete) return;
+
+      try {
+        await api.deleteClient(clientToDelete);
+        ui.showAlert('Client supprimé avec succès', 'success');
+        modal.close('delete-modal');
+        loadClients();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la suppression', 'danger');
+      }
+      clientToDelete = null;
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadClients);
+  </script>
+</body>
+</html>

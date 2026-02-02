@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réservations - Voyages Horizon</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <span>✈️</span>
+        Voyages Horizon
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/destinations.html">Destinations</a></li>
+        <li><a href="/voyages.html">Voyages</a></li>
+        <li><a href="/clients.html">Clients</a></li>
+        <li><a href="/reservations.html" class="active">Réservations</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Alert Container -->
+  <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 3000; width: 320px;"></div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1><span>📋</span> Réservations</h1>
+      <button class="btn btn-primary" onclick="openAddModal()">
+        <span>➕</span> Nouvelle réservation
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Statut</label>
+        <select id="filter-statut" onchange="loadReservations()">
+          <option value="">Tous les statuts</option>
+          <option value="En attente">En attente</option>
+          <option value="Confirmée">Confirmée</option>
+          <option value="Annulée">Annulée</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Reservations Table -->
+    <div class="table-container">
+      <table class="table" id="reservations-table">
+        <thead>
+          <tr>
+            <th>Réf.</th>
+            <th>Client</th>
+            <th>Voyage</th>
+            <th>Destination</th>
+            <th>Personnes</th>
+            <th>Prix Total</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="reservations-body">
+          <tr>
+            <td colspan="9">
+              <div class="loading">
+                <div class="spinner"></div>
+                <p>Chargement...</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <div id="reservation-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>📋</span> Nouvelle réservation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('reservation-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="reservation-form">
+          <div class="form-group">
+            <label class="form-label">Client *</label>
+            <select id="reservation-clientId" class="form-control" required>
+              <option value="">Sélectionner un client...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Voyage *</label>
+            <select id="reservation-voyageId" class="form-control" required onchange="updateVoyageInfo()">
+              <option value="">Sélectionner un voyage...</option>
+            </select>
+          </div>
+
+          <div id="voyage-info" class="alert alert-info hidden"></div>
+
+          <div class="form-group">
+            <label class="form-label">Nombre de personnes *</label>
+            <input type="number" id="reservation-nombrePersonnes" class="form-control" required min="1" value="1" onchange="updateTotal()" oninput="updateTotal()">
+          </div>
+
+          <div id="reservation-total" class="alert alert-success hidden"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('reservation-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveReservation()">Réserver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Reservation Modal -->
+  <div id="view-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><span>📋</span> Détails de la réservation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('view-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="view-content">
+        <!-- Content loaded dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('view-modal')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Confirmation Modal -->
+  <div id="cancel-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2><span>⚠️</span> Annulation</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('cancel-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler cette réservation ?</p>
+        <p class="text-secondary">Les places seront remises en vente.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('cancel-modal')">Non</button>
+        <button class="btn btn-warning" id="confirm-cancel-btn">Oui, annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2><span>⚠️</span> Suppression</h2>
+        <button class="modal-close" onclick="VoyagesHorizon.modal.close('delete-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette réservation ?</p>
+        <p class="text-secondary">Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="VoyagesHorizon.modal.close('delete-modal')">Annuler</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const { api, ui, modal } = window.VoyagesHorizon;
+    let reservationToCancel = null;
+    let reservationToDelete = null;
+    let voyagesData = {};
+
+    // Load clients for select
+    async function loadClientsSelect() {
+      try {
+        const response = await api.getClients({ limit: 100 });
+        const clients = response.data || [];
+        const select = document.getElementById('reservation-clientId');
+        select.innerHTML = '<option value="">Sélectionner un client...</option>' +
+          clients.map(c => `<option value="${c.id}">${c.prenom} ${c.nom} (${c.email})</option>`).join('');
+      } catch (error) {
+        console.error('Error loading clients:', error);
+      }
+    }
+
+    // Load voyages for select
+    async function loadVoyagesSelect() {
+      try {
+        const response = await api.getUpcomingVoyages();
+        const voyages = response.data || [];
+        voyagesData = {};
+        voyages.forEach(v => voyagesData[v.id] = v);
+        
+        const select = document.getElementById('reservation-voyageId');
+        select.innerHTML = '<option value="">Sélectionner un voyage...</option>' +
+          voyages.filter(v => v.placesDisponibles > 0).map(v => 
+            `<option value="${v.id}">${v.titre} - ${v.destination?.nom || ''} (${v.placesDisponibles} places)</option>`
+          ).join('');
+      } catch (error) {
+        console.error('Error loading voyages:', error);
+      }
+    }
+
+    // Update voyage info
+    function updateVoyageInfo() {
+      const voyageId = document.getElementById('reservation-voyageId').value;
+      const infoDiv = document.getElementById('voyage-info');
+      
+      if (voyageId && voyagesData[voyageId]) {
+        const voyage = voyagesData[voyageId];
+        infoDiv.innerHTML = `
+          <strong>${voyage.titre}</strong><br>
+          <small>📅 ${ui.formatDate(voyage.dateDepart)} - ${ui.formatDate(voyage.dateRetour)}</small><br>
+          <small>💰 ${ui.formatPrice(voyage.prixBase)} / personne</small><br>
+          <small>👥 ${voyage.placesDisponibles} places disponibles</small>
+        `;
+        infoDiv.classList.remove('hidden');
+        document.getElementById('reservation-nombrePersonnes').max = voyage.placesDisponibles;
+        updateTotal();
+      } else {
+        infoDiv.classList.add('hidden');
+        document.getElementById('reservation-total').classList.add('hidden');
+      }
+    }
+
+    // Update total
+    function updateTotal() {
+      const voyageId = document.getElementById('reservation-voyageId').value;
+      const nombrePersonnes = parseInt(document.getElementById('reservation-nombrePersonnes').value) || 1;
+      const totalDiv = document.getElementById('reservation-total');
+      
+      if (voyageId && voyagesData[voyageId]) {
+        const voyage = voyagesData[voyageId];
+        const total = parseFloat(voyage.prixBase) * nombrePersonnes;
+        totalDiv.innerHTML = `<strong>Total: ${ui.formatPrice(total)}</strong> (${nombrePersonnes} x ${ui.formatPrice(voyage.prixBase)})`;
+        totalDiv.classList.remove('hidden');
+      } else {
+        totalDiv.classList.add('hidden');
+      }
+    }
+
+    // Load reservations
+    async function loadReservations() {
+      const tbody = document.getElementById('reservations-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement...</p>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      const statut = document.getElementById('filter-statut').value;
+
+      try {
+        const params = {};
+        if (statut) params.statut = statut;
+
+        const response = await api.getReservations(params);
+        const reservations = response.data || [];
+
+        if (reservations.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <span>📋</span>
+                  <h3>Aucune réservation trouvée</h3>
+                  <p>Les réservations apparaîtront ici.</p>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = reservations.map(reservation => `
+          <tr>
+            <td><strong>#${reservation.id}</strong></td>
+            <td>
+              ${reservation.client ? `
+                <strong>${reservation.client.prenom} ${reservation.client.nom}</strong><br>
+                <small>${reservation.client.email}</small>
+              ` : 'Client inconnu'}
+            </td>
+            <td>${reservation.voyage?.titre || 'Voyage #' + reservation.voyageId}</td>
+            <td>
+              ${reservation.voyage?.destination ? `
+                ${reservation.voyage.destination.nom}, ${reservation.voyage.destination.pays}
+              ` : '-'}
+            </td>
+            <td>${reservation.nombrePersonnes}</td>
+            <td><strong>${ui.formatPrice(reservation.prixTotal)}</strong></td>
+            <td><span class="badge ${ui.getBadgeClass(reservation.statut)}">${reservation.statut}</span></td>
+            <td>${ui.formatDate(reservation.dateReservation)}</td>
+            <td>
+              <div class="table-actions">
+                <button class="btn btn-sm btn-outline" onclick="viewReservation(${reservation.id})">👁️</button>
+                ${reservation.statut !== 'Annulée' ? `
+                  <button class="btn btn-sm btn-warning" onclick="confirmCancel(${reservation.id})">❌</button>
+                ` : ''}
+                <button class="btn btn-sm btn-danger" onclick="confirmDelete(${reservation.id})">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9">
+              <div class="alert alert-danger">
+                <span>⚠️</span>
+                <span>Impossible de charger les réservations</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Open add modal
+    async function openAddModal() {
+      await Promise.all([loadClientsSelect(), loadVoyagesSelect()]);
+      document.getElementById('reservation-form').reset();
+      document.getElementById('voyage-info').classList.add('hidden');
+      document.getElementById('reservation-total').classList.add('hidden');
+      modal.open('reservation-modal');
+    }
+
+    // View reservation
+    async function viewReservation(id) {
+      try {
+        const response = await api.getReservation(id);
+        const reservation = response.data;
+
+        document.getElementById('view-content').innerHTML = `
+          <div class="mb-2">
+            <h3>📋 Réservation #${reservation.id}</h3>
+            <span class="badge ${ui.getBadgeClass(reservation.statut)}">${reservation.statut}</span>
+          </div>
+          
+          <div class="card mb-2">
+            <div class="card-body">
+              <h4>👤 Client</h4>
+              ${reservation.client ? `
+                <p><strong>${reservation.client.prenom} ${reservation.client.nom}</strong></p>
+                <div class="card-info">
+                  <div class="card-info-item"><span>📧</span><span>${reservation.client.email}</span></div>
+                  ${reservation.client.telephone ? `<div class="card-info-item"><span>📞</span><span>${reservation.client.telephone}</span></div>` : ''}
+                </div>
+              ` : '<p>Client inconnu</p>'}
+            </div>
+          </div>
+
+          <div class="card mb-2">
+            <div class="card-body">
+              <h4>✈️ Voyage</h4>
+              ${reservation.voyage ? `
+                <p><strong>${reservation.voyage.titre}</strong></p>
+                <div class="card-info">
+                  <div class="card-info-item"><span>📍</span><span>${reservation.voyage.destination?.nom || ''}, ${reservation.voyage.destination?.pays || ''}</span></div>
+                  <div class="card-info-item"><span>📅</span><span>${ui.formatDate(reservation.voyage.dateDepart)} - ${ui.formatDate(reservation.voyage.dateRetour)}</span></div>
+                </div>
+              ` : '<p>Voyage inconnu</p>'}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h4>💰 Détails</h4>
+              <div class="card-info">
+                <div class="card-info-item"><span>👥</span><span>${reservation.nombrePersonnes} personne(s)</span></div>
+                <div class="card-info-item"><span>💵</span><span><strong>${ui.formatPrice(reservation.prixTotal)}</strong></span></div>
+                <div class="card-info-item"><span>📅</span><span>Réservé le ${ui.formatDate(reservation.dateReservation)}</span></div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        modal.open('view-modal');
+      } catch (error) {
+        ui.showAlert('Impossible de charger les détails de la réservation', 'danger');
+      }
+    }
+
+    // Save reservation
+    async function saveReservation() {
+      const clientId = document.getElementById('reservation-clientId').value;
+      const voyageId = document.getElementById('reservation-voyageId').value;
+      const nombrePersonnes = parseInt(document.getElementById('reservation-nombrePersonnes').value);
+
+      if (!clientId || !voyageId) {
+        ui.showAlert('Veuillez sélectionner un client et un voyage', 'warning');
+        return;
+      }
+
+      try {
+        await api.createReservation({
+          clientId: parseInt(clientId),
+          voyageId: parseInt(voyageId),
+          nombrePersonnes
+        });
+        ui.showAlert('Réservation créée avec succès !', 'success');
+        modal.close('reservation-modal');
+        loadReservations();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la réservation', 'danger');
+      }
+    }
+
+    // Confirm cancel
+    function confirmCancel(id) {
+      reservationToCancel = id;
+      modal.open('cancel-modal');
+    }
+
+    // Cancel reservation
+    document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+      if (!reservationToCancel) return;
+
+      try {
+        await api.cancelReservation(reservationToCancel);
+        ui.showAlert('Réservation annulée avec succès', 'success');
+        modal.close('cancel-modal');
+        loadReservations();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de l\'annulation', 'danger');
+      }
+      reservationToCancel = null;
+    });
+
+    // Confirm delete
+    function confirmDelete(id) {
+      reservationToDelete = id;
+      modal.open('delete-modal');
+    }
+
+    // Delete reservation
+    document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+      if (!reservationToDelete) return;
+
+      try {
+        await api.deleteReservation(reservationToDelete);
+        ui.showAlert('Réservation supprimée avec succès', 'success');
+        modal.close('delete-modal');
+        loadReservations();
+      } catch (error) {
+        ui.showAlert(error.message || 'Erreur lors de la suppression', 'danger');
+      }
+      reservationToDelete = null;
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadReservations);
+  </script>
+</body>
+</html>

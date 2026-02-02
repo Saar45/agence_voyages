@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const db = require('./models');
@@ -20,8 +21,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Routes de base
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({
     message: 'Bienvenue sur l\'API Voyages Horizon',
     version: '1.0.0',
